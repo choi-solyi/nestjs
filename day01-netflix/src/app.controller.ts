@@ -1,50 +1,81 @@
-import { Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
+interface Movie {
+  id: number;
+  title: string;
+}
 @Controller('movie')
 export class AppController {
+  private movies: Movie[] = [
+    {
+      id: 1,
+      title: '해리포터',
+    },
+    {
+      id: 3,
+      title: '반지의 제왕',
+    },
+  ];
+  private idCounter = 4;
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getMovies() {
-    return [
-      {
-        id: 1,
-        name: '해리포터',
-        characters: ['해리포터', '헤르미온느', '론'],
-      },
-    ];
+  getMovies(@Query('title') title?: string) {
+    if (!title) return this.movies;
+
+    return this.movies.filter((movie) => movie.title.includes(title));
   }
 
   @Get(':id')
-  getMovie() {
-    return {
-      id: 1,
-      name: '해리포터',
-      characters: ['해리포터', '헤르미온느', '론'],
-    };
+  getMovie(@Param('id') id: string) {
+    const movie = this.movies.find((m) => m.id === +id);
+    if (!movie) {
+      throw new NotFoundException('존재하지 않는 ID입니다.');
+    }
+    return movie;
   }
 
   @Post()
-  postMovie() {
-    return {
-      id: 3,
-      name: '반지의 제왕',
-      characters: ['프로도', '샘', '아라고른'],
+  postMovie(@Body('title') title: string) {
+    const movie: Movie = {
+      id: this.idCounter++,
+      title,
     };
+
+    this.movies.push(movie);
+
+    return movie;
   }
 
   @Patch(':id')
-  patchMovie() {
-    return {
-      id: 1,
-      name: '해리포터',
-      characters: ['해리포터', '헤르미온느', '론', '드레이코'],
-    };
+  patchMovie(@Param('id') id: string, @Body('title') title: string) {
+    const movie = this.movies.find((m) => m.id === +id);
+    if (!movie) {
+      throw new NotFoundException('존재하지 않는 ID입니다.');
+    }
+    Object.assign(movie, { title });
+    return movie;
   }
 
   @Delete(':id')
-  deleteMovie() {
-    return 1;
+  deleteMovie(@Param('id') id: string) {
+    const movieIndex = this.movies.findIndex((m) => m.id === +id);
+    if (movieIndex === -1) {
+      throw new NotFoundException('존재하지 않는 ID입니다.');
+    }
+    this.movies.splice(movieIndex, 1);
+
+    return id;
   }
 }
