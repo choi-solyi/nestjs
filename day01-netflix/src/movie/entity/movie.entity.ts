@@ -1,20 +1,60 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { BaseTable } from './base.entity';
+import { MovieDetail } from './movie-detail.entity';
 
-// @Exclude()
-export class Movie {
+// ---- Entity Embedding 방식 ---- //
+// base : { createdAt, ... }  이런식으로 반환됨
+// export class BaseEntity {
+//   @CreateDateColumn()
+//   createdAt: Date;
+
+//   @UpdateDateColumn()
+//   updatedAt: Date;
+
+//   @VersionColumn()
+//   version: number;
+// }
+
+// @Entity()
+// export class Movie {
+//   @PrimaryGeneratedColumn()
+//   id: number;
+
+//   @Column()
+//   title: string;
+
+//   @Column()
+//   genre: string;
+
+//   @Column(() => BaseEntity)
+//   base: BaseEntity;
+// }
+
+// ---- Entity Inheritance 방식 ---- //
+
+@Entity()
+export class Movie extends BaseTable {
+  @PrimaryGeneratedColumn()
   id: number;
-  @Expose() // 노출해도되는값
+
+  @Column()
   title: string;
 
-  // @Transform(({ value }) => 'solyi')
-  @Transform(({ value }) => value.toString().toUpperCase())
+  @Column()
   genre: string;
 
-  // @Expose() // 노출해도되는값
-  // get description() {
-  //   return '' + this.title + '는 장르가 ' + this.genre + '인 영화입니다.';
-  // }
+  @OneToOne(
+    () => MovieDetail, // 연결
+    (movieDetail) => movieDetail.id, // MovieDetail의 id와 연결
+    { cascade: true }, // cascade
+  )
+  @JoinColumn()
+  detail: MovieDetail;
 }
-
-// Movie 엔터티가 보안에 예민한 경우 전체를 @Exclude()로 감싸고,
-// 노출하고 싶은 필드에 @Expose()를 붙여서 노출시킬 수 있다.
