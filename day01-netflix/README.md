@@ -1,3 +1,16 @@
+- NestJS 설치
+	- `npm i -g @nestjs/cli`
+- nest 프로젝트 생성
+	- `nest new hello-world`
+- nest 프로젝트 실행
+	- `pnpm start` / `pnpm start:dev`
+- 모듈 생성
+  - `nest g resource` / `nest generate resource`
+- validator, transformer 
+  - `pnpm i class-validator class-transformer`
+- config, joi, typeorm, pg 
+  - `pnpm i @nestjs/config joi @nestjs/typeorm typeorm pg`
+---
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
