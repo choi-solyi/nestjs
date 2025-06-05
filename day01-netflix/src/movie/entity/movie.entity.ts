@@ -3,11 +3,16 @@ import {
   Entity,
   JoinColumn,
   JoinTable,
+  ManyToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { BaseTable } from './base.entity';
+
 import { MovieDetail } from './movie-detail.entity';
+import { BaseTable } from 'src/common/entity/base.entity';
+import { Director } from 'src/director/entity/director.entity';
+import { Genre } from 'src/genre/entities/genre.entity';
 
 // ---- Entity Embedding 방식 ---- //
 // base : { createdAt, ... }  이런식으로 반환됨
@@ -44,11 +49,8 @@ export class Movie extends BaseTable {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   title: string;
-
-  @Column()
-  genre: string;
 
   @OneToOne(
     () => MovieDetail, // 연결
@@ -57,4 +59,11 @@ export class Movie extends BaseTable {
   )
   @JoinColumn()
   detail: MovieDetail;
+
+  @ManyToOne(() => Director, (d) => d.id, { cascade: true, nullable: false })
+  director: Director;
+
+  @ManyToMany(() => Genre, (genre) => genre.movies)
+  @JoinTable()
+  genres: Genre[];
 }
