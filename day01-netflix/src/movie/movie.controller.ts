@@ -11,6 +11,7 @@ import {
   ClassSerializerInterceptor,
   ParseIntPipe,
   BadRequestException,
+  Request,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -23,7 +24,11 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  getMovies(@Query('title', MovieTitleValidationPipe) title?: string) {
+  getMovies(
+    @Request() req: any,
+    @Query('title', MovieTitleValidationPipe) title?: string,
+  ) {
+    console.log(req.user);
     return this.movieService.findAll(title);
   }
 

@@ -56,12 +56,14 @@ export class AuthService {
       throw new BadRequestException('Token 형식이 다릅니다');
 
     try {
-      //decode : 검증은 안하고  payload만 가져오는것
-      //verify : payload도 가져오면서 검증도 함
+      // decode : 검증은 안하고  payload만 가져오는것
+      // verify : payload도 가져오면서 검증도 함
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>(
-          envVariableKeys.refreshTokenSecret,
+          isRefreshToken
+            ? envVariableKeys.refreshTokenSecret
+            : envVariableKeys.accessTokenSecret,
         )!,
       });
 
