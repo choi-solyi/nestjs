@@ -25,8 +25,9 @@ export class BearerTokenMiddleware implements NestMiddleware {
       return;
     }
 
-    const token = this.validateBearerToken(authHeader);
     try {
+      const token = this.validateBearerToken(authHeader);
+
       // decode는 검증은 하지 않는다.
       const decodedPayload = this.jwtService.decode(token);
 
@@ -49,7 +50,9 @@ export class BearerTokenMiddleware implements NestMiddleware {
       req.user = payload;
       next();
     } catch (e) {
-      throw new UnauthorizedException('토큰이 만료되었습니다.');
+      // middleware 다음에 guard 가 동작하므로 그냥 바로 next() 해버리면 됨
+      next();
+      // throw new UnauthorizedException('토큰이 만료되었습니다.');
     }
   }
 
