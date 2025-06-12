@@ -20,6 +20,8 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieTitleValidationPipe } from './pipe/movie-title-validation';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
+import { RBAC } from 'src/auth/decorator/rbac.decorator';
+import { Role } from 'src/user/entities/user.entity';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -33,6 +35,7 @@ export class MovieController {
   }
 
   @Get(':id')
+  @Public()
   getMovie(
     @Param(
       'id',
@@ -49,11 +52,13 @@ export class MovieController {
 
   @Post()
   @UseGuards(AuthGuard)
+  @RBAC(Role.admin)
   postMovie(@Body() body: CreateMovieDto) {
     return this.movieService.create(body);
   }
 
   @Patch(':id')
+  @RBAC(Role.admin)
   patchMovie(
     @Param(
       'id',
@@ -70,6 +75,7 @@ export class MovieController {
   }
 
   @Delete(':id')
+  @RBAC(Role.admin)
   deleteMovie(
     @Param(
       'id',
