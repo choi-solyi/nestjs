@@ -8,6 +8,9 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true, // 필터링. DTO에 정의되지 않은 불필요한 속성들을 자동으로 제거
       forbidNonWhitelisted: true, // 거부. 위에서 제거만 하는 대신, 아예 에러를 던짐.
+      transformOptions: {
+        enableImplicitConversion: true, // 타입을 기반으로 입력하는 값을 변경해줌 "자동으로"
+      },
     }),
   );
   await app.listen(process.env.PORT ?? 3000);

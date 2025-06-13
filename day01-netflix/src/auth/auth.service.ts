@@ -124,7 +124,8 @@ export class AuthService {
       },
       {
         secret: isRefreshToken ? refreshTokenSecret : accessTokenSecret,
-        expiresIn: isRefreshToken ? '24h' : 300,
+        // expiresIn: isRefreshToken ? '24h' : 300,
+        expiresIn: isRefreshToken ? '24h' : '24h', // 토큰 만료시간이 너무 짧아서 늘림
       },
     );
   }
