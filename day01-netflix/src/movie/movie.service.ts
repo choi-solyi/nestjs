@@ -50,8 +50,19 @@ export class MovieService {
     //   this.commonService.applyPagePaginationParamsToQb(query, { take, page });
     // }
 
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(query, dto);
+
+    const [data, count] = await query.getManyAndCount();
+
+    return {
+      data,
+      nextCursor,
+      count,
+    };
+
     this.commonService.applyCursorPaginationParamsToQb(query, dto);
-    return await query.getManyAndCount();
+    // return await query.getManyAndCount();
 
     // [QueryBuilder]
     // const query = this.movieRepository
