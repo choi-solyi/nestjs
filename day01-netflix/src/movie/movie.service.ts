@@ -30,7 +30,10 @@ export class MovieService {
   ) {}
 
   async findAll(dto: GetMoviesDto) {
-    const { title, take, page } = dto;
+    // Page based pagination 일때
+    // const { title, take, page } = dto; // Page based pagination 일때
+
+    const { title } = dto;
     const query = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.detail', 'detail')
@@ -42,9 +45,12 @@ export class MovieService {
         title: `%${title}%`,
       });
 
-    if (take && page) {
-      this.commonService.applyPagePaginationParamsToQb(query, { take, page });
-    }
+    // Page based pagination 일때
+    // if (take && page) {
+    //   this.commonService.applyPagePaginationParamsToQb(query, { take, page });
+    // }
+
+    this.commonService.applyCursorPaginationParamsToQb(query, dto);
     return await query.getManyAndCount();
 
     // [QueryBuilder]
