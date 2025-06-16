@@ -24,6 +24,7 @@ import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entities/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
+import { TransactionInterCeptor } from 'src/common/interceptor/transaction.intercetptor';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -56,8 +57,9 @@ export class MovieController {
   @Post()
   @UseGuards(AuthGuard)
   @RBAC(Role.admin)
-  postMovie(@Body() body: CreateMovieDto) {
-    return this.movieService.create(body);
+  @UseInterceptors(TransactionInterCeptor)
+  postMovie(@Body() body: CreateMovieDto, @Request() req) {
+    return this.movieService.create(body, req.queryRunner);
   }
 
   @Patch(':id')
