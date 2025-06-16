@@ -20,10 +20,11 @@ import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { envVariableKeys } from './common/const/env.const';
 import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RBACGuard } from './auth/guard/rbac.guard';
 import { ResponseTimeInterceptortor } from './common/interceptor/response-time.interceptor';
+import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 
 @Module({
   imports: [
@@ -74,6 +75,10 @@ import { ResponseTimeInterceptortor } from './common/interceptor/response-time.i
     //   provide: APP_INTERCEPTOR,
     //   useClass: ResponseTimeInterceptortor,
     // },
+    {
+      provide: APP_FILTER,
+      useClass: ForbiddenExceptionFilter,
+    },
   ],
 })
 export class AppModule implements NestModule {
