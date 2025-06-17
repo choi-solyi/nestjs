@@ -26,6 +26,8 @@ import { RBACGuard } from './auth/guard/rbac.guard';
 import { ResponseTimeInterceptortor } from './common/interceptor/response-time.interceptor';
 import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -56,6 +58,14 @@ import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter'
         synchronize: true, // Note: set to false in production
       }),
       inject: [ConfigService],
+    }),
+    ServeStaticModule.forRoot({
+      // http://localhost:3000/public/movie.. 의 public 을 생략할 수 있음
+      rootPath: join(process.cwd(), 'public'),
+
+      // 하지만 movie 단건 조회와 경로가 동일해짐.
+      // http://localhost:3000/public/movie 로 조회할 수 있음
+      serveRoot: '/public/',
     }),
     MovieModule,
     DirectorModule,

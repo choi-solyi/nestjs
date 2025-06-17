@@ -166,8 +166,7 @@ export class MovieController {
     movie: Express.Multer.File,
     //  파일 필드 여러개
   ) {
-    console.log(movie);
-    return this.movieService.create(body, req.queryRunner);
+    return this.movieService.create(body, movie.filename, req.queryRunner);
   }
 
   @Patch(':id')
