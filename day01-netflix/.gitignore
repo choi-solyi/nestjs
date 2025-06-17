@@ -3,6 +3,7 @@
 /node_modules
 /build
 /public/movie
+/public/temp
 # Logs
 logs
 *.log

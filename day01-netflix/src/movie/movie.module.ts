@@ -16,22 +16,22 @@ import { v4 } from 'uuid';
   imports: [
     TypeOrmModule.forFeature([Movie, MovieDetail, Director, Genre]),
     CommonModule,
-    MulterModule.register({
-      storage: diskStorage({
-        /// .../Netflix/public/movie
-        destination: join(process.cwd(), 'public', 'movie'), // current working directory
-        // filename: (req, file, cb) => {
-        //   const split = file.originalname.split('.');
+    // MulterModule.register({
+    //   storage: diskStorage({
+    //     /// .../Netflix/public/movie
+    //     destination: join(process.cwd(), 'public', 'movie'), // current working directory
+    //     // filename: (req, file, cb) => {
+    //     //   const split = file.originalname.split('.');
 
-        //   let extension = 'mp4';
+    //     //   let extension = 'mp4';
 
-        //   if (split.length > 1) {
-        //     extension = split[split.length - 1];
-        //   }
-        //   cb(null, `${v4()}_${Date.now()}.${extension}`);
-        // },
-      }),
-    }),
+    //     //   if (split.length > 1) {
+    //     //     extension = split[split.length - 1];
+    //     //   }
+    //     //   cb(null, `${v4()}_${Date.now()}.${extension}`);
+    //     // },
+    //   }),
+    // }),
   ],
   controllers: [MovieController],
   providers: [MovieService],

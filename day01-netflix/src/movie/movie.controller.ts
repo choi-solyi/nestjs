@@ -132,41 +132,12 @@ export class MovieController {
   //   return this.movieService.create(body, req.queryRunner);
   // }
 
-  // MovieFilter 적용해서 filename 적용하는 방법
   @Post()
   @UseGuards(AuthGuard)
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterCeptor)
-  @UseInterceptors(
-    FileInterceptor('movie', {
-      limits: {
-        fileSize: 20000000,
-      },
-      fileFilter(req, file, callback) {
-        console.log(file);
-
-        if (file.mimetype !== 'video/mp4')
-          return callback(
-            new BadRequestException('mp4 포맷만 업로드 하실 수 있습니다.'),
-            false,
-          );
-        return callback(null, true);
-      },
-    }),
-  )
-  postMovie(
-    @Body() body: CreateMovieDto,
-    @Request() req,
-    @UploadedFile(
-      new MovieFilePipe({
-        maxSize: 20,
-        mimetype: 'video/mp4',
-      }),
-    )
-    movie: Express.Multer.File,
-    //  파일 필드 여러개
-  ) {
-    return this.movieService.create(body, movie.filename, req.queryRunner);
+  postMovie(@Body() body: CreateMovieDto, @Request() req) {
+    return this.movieService.create(body, req.queryRunner);
   }
 
   @Patch(':id')

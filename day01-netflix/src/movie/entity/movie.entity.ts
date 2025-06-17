@@ -13,6 +13,7 @@ import { MovieDetail } from './movie-detail.entity';
 import { BaseTable } from 'src/common/entity/base.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
+import { Transform } from 'class-transformer';
 
 // ---- Entity Embedding 방식 ---- //
 // base : { createdAt, ... }  이런식으로 반환됨
@@ -61,6 +62,7 @@ export class Movie extends BaseTable {
   detail: MovieDetail;
 
   @Column()
+  @Transform(({ value }) => `http://localhost:3000/${value}`)
   movieFilePath: string;
 
   @ManyToOne(() => Director, (d) => d.id, { cascade: true, nullable: false })
