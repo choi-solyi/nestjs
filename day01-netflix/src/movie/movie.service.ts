@@ -108,6 +108,7 @@ export class MovieService {
       .leftJoinAndSelect('movie.detail', 'detail')
       .leftJoinAndSelect('movie.director', 'director')
       .leftJoinAndSelect('movie.genres', 'genres')
+      .leftJoinAndSelect('movie.creator', 'creator')
       .where('movie.id = :id', { id })
       .getOne();
 
@@ -121,7 +122,11 @@ export class MovieService {
     // return movie;
   }
 
-  async create(createMovieDto: CreateMovieDto, qr: QueryRunner) {
+  async create(
+    createMovieDto: CreateMovieDto,
+    userId: number,
+    qr: QueryRunner,
+  ) {
     const director = await qr.manager.findOne(Director, {
       where: { id: createMovieDto.directorId },
     });
@@ -150,10 +155,6 @@ export class MovieService {
     const movieFolder = join('public', 'movie');
     const tempFolder = join('public', 'temp');
 
-    await rename(
-      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
-      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
-    );
     const movie = await qr.manager
       .createQueryBuilder()
       .insert()
@@ -162,6 +163,7 @@ export class MovieService {
         title: createMovieDto.title,
         detail: { id: movieDetailId }, // MovieDetail의 id를 참조
         director: director,
+        creator: { id: userId },
         movieFilePath: join(movieFolder, createMovieDto.movieFileName),
       })
       .execute();
@@ -173,6 +175,12 @@ export class MovieService {
       .relation(Movie, 'genres')
       .of(movieId)
       .add(genres.map((g) => g.id));
+
+    // transaction 중간에 문제가 생길 수도 있으니 return 직전에서 파일을 옮긴다
+    await rename(
+      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+    );
 
     return qr.manager.findOne(Movie, {
       where: { id: movieId },

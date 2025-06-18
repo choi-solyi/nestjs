@@ -33,6 +33,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { MovieFilePipe } from './pipe/movie-file.pipe';
+import { UserId } from 'src/user/decorator/user-id.decorator';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -136,8 +137,14 @@ export class MovieController {
   @UseGuards(AuthGuard)
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterCeptor)
-  postMovie(@Body() body: CreateMovieDto, @Request() req) {
-    return this.movieService.create(body, req.queryRunner);
+  postMovie(
+    @Body() body: CreateMovieDto,
+    @Request() req,
+    @UserId() userId: number,
+  ) {
+    // req, req.user, req.user.sub
+
+    return this.movieService.create(body, userId, req.queryRunner);
   }
 
   @Patch(':id')

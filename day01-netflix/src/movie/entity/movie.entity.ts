@@ -14,6 +14,7 @@ import { BaseTable } from 'src/common/entity/base.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
 import { Transform } from 'class-transformer';
+import { User } from 'src/user/entities/user.entity';
 
 // ---- Entity Embedding 방식 ---- //
 // base : { createdAt, ... }  이런식으로 반환됨
@@ -49,6 +50,9 @@ import { Transform } from 'class-transformer';
 export class Movie extends BaseTable {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, (user) => user.createdMovies)
+  creator: User;
 
   @Column({ unique: true })
   title: string;
