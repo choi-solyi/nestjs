@@ -71,13 +71,16 @@ export class MovieService {
 
     if (userId) {
       const movieIds = data.map((movie) => movie.id);
-      const likedMovies = await this.likeRepository
-        .createQueryBuilder('mul')
-        .leftJoinAndSelect('mul.user', 'user')
-        .leftJoinAndSelect('mul.movie', 'movie')
-        .where('movie.id IN(:...movieIds)', { movieIds })
-        .andWhere('user.id = :userId', { userId })
-        .getMany();
+      const likedMovies =
+        movieIds.length === 0
+          ? []
+          : await this.likeRepository
+              .createQueryBuilder('mul')
+              .leftJoinAndSelect('mul.user', 'user')
+              .leftJoinAndSelect('mul.movie', 'movie')
+              .where('movie.id IN(:...movieIds)', { movieIds })
+              .andWhere('user.id = :userId', { userId })
+              .getMany();
 
       /**
        * {
@@ -359,8 +362,6 @@ export class MovieService {
       .getOne();
 
     if (likeRecord) {
-      console.log(isLike);
-      console.log(likeRecord.isLike);
       if (isLike === likeRecord.isLike) {
         await this.likeRepository.delete({
           movie,
