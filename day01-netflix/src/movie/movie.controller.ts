@@ -15,6 +15,7 @@ import {
   UseGuards,
   UploadedFile,
   UploadedFiles,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -38,7 +39,7 @@ import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
@@ -178,5 +179,38 @@ export class MovieController {
     id: string,
   ) {
     return this.movieService.remove(+id);
+  }
+
+  /**
+   * [Like] [Dislike]
+   *
+   * 아무것도 누르지 않은 상태
+   * Like & Dislike 모두 버튼 꺼져 있음
+   *
+   * Like 버튼 누르면 Like 버튼 불켜짐
+   * 다시 Like 버튼 누르면 불 꺼짐
+   *
+   * Dislike 버튼 누르면 Dislike 버튼 불켜짐
+   * 다시 Dislike 버튼 누르면 불 꺼짐
+   *
+   * Like 버튼 누름 Like 버튼 불켜짐
+   * -> Like 버튼 불 꺼지고 Dislike 버튼 불 켜짐
+   *
+   */
+
+  @Post(':id/like')
+  async createMovieLike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {
+    return await this.movieService.toggleMovieLike(movieId, userId, true);
+  }
+
+  @Post(':id/dislike')
+  async createMovieDislike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {
+    return await this.movieService.toggleMovieLike(movieId, userId, false);
   }
 }

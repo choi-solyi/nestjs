@@ -5,6 +5,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -15,6 +16,7 @@ import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
 import { Transform } from 'class-transformer';
 import { User } from 'src/user/entities/user.entity';
+import { MovieUserLike } from './movie-user-like.entity';
 
 // ---- Entity Embedding 방식 ---- //
 // base : { createdAt, ... }  이런식으로 반환됨
@@ -78,4 +80,7 @@ export class Movie extends BaseTable {
 
   @Column({ default: 0 })
   likeCount: number;
+
+  @OneToMany(() => MovieUserLike, (mul) => mul.movie)
+  likedUsers: MovieUserLike[];
 }

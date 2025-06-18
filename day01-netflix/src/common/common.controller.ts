@@ -16,7 +16,7 @@ export class CommonController {
         fileSize: 20000000,
       },
       fileFilter(req, file, callback) {
-        console.log(file);
+        // console.log(file);
 
         if (file.mimetype !== 'video/mp4')
           return callback(
