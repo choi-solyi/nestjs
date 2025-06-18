@@ -15,6 +15,8 @@ export class QueryFailedExceptionFilter implements ExceptionFilter {
     console.log(exception.message);
     if (exception.message.includes('중복된 키')) {
       message = '중복 키 에러';
+    } else {
+      message = exception.message;
     }
 
     response.status(status).json({

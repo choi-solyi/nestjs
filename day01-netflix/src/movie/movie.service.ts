@@ -43,7 +43,7 @@ export class MovieService {
     private readonly commonService: CommonService,
   ) {}
 
-  async findAll(dto: GetMoviesDto) {
+  async findAll(dto: GetMoviesDto, userId?: number) {
     // Page based pagination 일때
     // const { title, take, page } = dto; // Page based pagination 일때
 
@@ -67,8 +67,36 @@ export class MovieService {
     const { nextCursor } =
       await this.commonService.applyCursorPaginationParamsToQb(query, dto);
 
-    const [data, count] = await query.getManyAndCount();
+    let [data, count] = await query.getManyAndCount();
 
+    if (userId) {
+      const movieIds = data.map((movie) => movie.id);
+      const likedMovies = await this.likeRepository
+        .createQueryBuilder('mul')
+        .leftJoinAndSelect('mul.user', 'user')
+        .leftJoinAndSelect('mul.movie', 'movie')
+        .where('movie.id IN(:...movieIds)', { movieIds })
+        .andWhere('user.id = :userId', { userId })
+        .getMany();
+
+      /**
+       * {
+       *  movieId: boolean
+       * }
+       */
+      const likedMovieMap = likedMovies.reduce(
+        (acc, next) => ({
+          ...acc,
+          [next.movie.id]: next.isLike,
+        }),
+        {},
+      );
+
+      data = data.map((x) => ({
+        ...x,
+        likeStatus: x.id in likedMovieMap ? likedMovieMap[x.id] : null,
+      }));
+    }
     return {
       data,
       nextCursor,
