@@ -29,6 +29,8 @@ import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter'
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MovieUserLike } from './movie/entity/movie-user-like.entity';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
 
 @Module({
   imports: [
@@ -68,6 +70,10 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
       // http://localhost:3000/public/movie 로 조회할 수 있음
       serveRoot: '/public/',
     }),
+    CacheModule.register({
+      ttl: 3000, // 메모리에 3초 보관
+      isGlobal: true,
+    }),
     MovieModule,
     DirectorModule,
     GenreModule,
@@ -87,13 +93,17 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
       provide: APP_INTERCEPTOR,
       useClass: ResponseTimeInterceptortor,
     },
-    {
-      provide: APP_FILTER,
-      useClass: ForbiddenExceptionFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: ForbiddenExceptionFilter,
+    // },
     {
       provide: APP_FILTER,
       useClass: QueryFailedExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ThrottleInterceptor,
     },
   ],
 })

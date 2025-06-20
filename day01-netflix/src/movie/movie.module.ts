@@ -26,9 +26,9 @@ import { CacheModule } from '@nestjs/cache-manager';
       User,
     ]),
     CommonModule,
-    CacheModule.register({
-      ttl: 3000, // 메모리에 3초 보관
-    }),
+    // CacheModule.register({   // App.module로 이사
+    //   ttl: 3000, // 메모리에 3초 보관
+    // }),
     // MulterModule.register({
     //   storage: diskStorage({
     //     /// .../Netflix/public/movie

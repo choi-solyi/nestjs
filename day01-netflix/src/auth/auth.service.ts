@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { envVariableKeys } from 'src/common/const/env.const';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +21,26 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
+  async tokenBlock(token: string) {
+    const payload = this.jwtService.decode(token);
+
+    /// payload['exp'] -epoch time seconds
+    const expiryDate = +new Date(payload['exp'] * 1000); //ms 이므로 곱하기 1000
+    const now = +Date.now();
+    const diffrenceInSeconds = (expiryDate - now) / 1000;
+
+    await this.cacheManager.set(
+      `BLOCK_TOKEN_${token}`,
+      payload,
+      Math.max(diffrenceInSeconds * 1000, 1), // 최소 1ms
+    );
+
+    return true;
+  }
   parseBasicToken(rawToken: string) {
     // 1. 토큰을 띄어쓰기 기준으로 스프릿 한 뒤 토큰 값만 추출하기
     const basicSplit = rawToken.split(' ');

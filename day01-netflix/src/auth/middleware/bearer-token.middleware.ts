@@ -1,5 +1,8 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
+  ForbiddenException,
+  Inject,
   Injectable,
   NestMiddleware,
   UnauthorizedException,
@@ -14,6 +17,8 @@ export class BearerTokenMiddleware implements NestMiddleware {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
@@ -25,19 +30,28 @@ export class BearerTokenMiddleware implements NestMiddleware {
       return;
     }
 
+    const token = this.validateBearerToken(authHeader);
+    const blockedToken = await this.cacheManager.get(`BLOCK_TOKEN_${token}`);
+
+    if (blockedToken) throw new UnauthorizedException('차단된 토큰입니다.');
+
+    const tokenKey = `TOKEN_${token}`;
+    const cachedPayload = await this.cacheManager.get(tokenKey);
+
+    if (cachedPayload) {
+      console.log('cachedPayload:', cachedPayload);
+      req.user = cachedPayload;
+
+      return next();
+    }
+
+    // decode는 검증은 하지 않는다.
+    const decodedPayload = this.jwtService.decode(token);
+
+    if (decodedPayload.type !== 'refresh' && decodedPayload.type !== 'access') {
+      throw new UnauthorizedException('잘못된 토큰입니다');
+    }
     try {
-      const token = this.validateBearerToken(authHeader);
-
-      // decode는 검증은 하지 않는다.
-      const decodedPayload = this.jwtService.decode(token);
-
-      if (
-        decodedPayload.type !== 'refresh' &&
-        decodedPayload.type !== 'access'
-      ) {
-        throw new UnauthorizedException('잘못된 토큰입니다');
-      }
-
       const secretKey =
         decodedPayload.type === 'refresh'
           ? envVariableKeys.refreshTokenSecret

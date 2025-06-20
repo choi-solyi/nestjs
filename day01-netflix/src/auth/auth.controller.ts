@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Headers,
@@ -20,6 +21,11 @@ export class AuthController {
   /// authorization: Basic $token
   registerUser(@Headers('authorization') token: string) {
     return this.authService.register(token);
+  }
+
+  @Post('token/block')
+  blockToken(@Body('token') token: string) {
+    return this.authService.tokenBlock(token);
   }
 
   @Public()
