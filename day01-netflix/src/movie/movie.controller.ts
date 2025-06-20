@@ -26,7 +26,7 @@ import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entities/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
-import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
+// import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 import { TransactionInterCeptor } from 'src/common/interceptor/transaction.intercetptor';
 import {
   FileFieldsInterceptor,
@@ -37,6 +37,11 @@ import { MovieFilePipe } from './pipe/movie-file.pipe';
 import { UserId } from 'src/user/decorator/user-id.decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import {
+  CacheKey,
+  CacheTTL,
+  CacheInterceptor as CI,
+} from '@nestjs/cache-manager';
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
 // @UseInterceptors(CacheInterceptor)
@@ -47,6 +52,15 @@ export class MovieController {
   @Public()
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
+  }
+
+  @Get('recent')
+  @UseInterceptors(CI) // CacheInterceptor를 쓰면 console이 찍히지 않음.
+  @CacheKey('getMoviesRecent')
+  @CacheTTL(3000)
+  getMoviesRecent() {
+    console.log('getMovieRecent 실행');
+    return this.movieService.findRecent();
   }
 
   @Get(':id')

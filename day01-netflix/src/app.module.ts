@@ -83,10 +83,10 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
       provide: APP_GUARD,
       useClass: RBACGuard,
     },
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: ResponseTimeInterceptortor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseTimeInterceptortor,
+    },
     {
       provide: APP_FILTER,
       useClass: ForbiddenExceptionFilter,

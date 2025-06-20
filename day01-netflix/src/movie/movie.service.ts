@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { join } from 'path';
 import { rename } from 'fs/promises';
 import { User } from 'src/user/entities/user.entity';
 import { MovieUserLike } from './entity/movie-user-like.entity';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 @Injectable()
 export class MovieService {
   constructor(
@@ -41,7 +43,39 @@ export class MovieService {
     private readonly likeRepository: Repository<MovieUserLike>,
     private readonly dataSource: DataSource,
     private readonly commonService: CommonService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
+
+  async findRecent() {
+    /// [캐시 get set]
+    // await this.cacheManager.set('number', 10);
+    // const data = await this.cacheManager.get('number');
+    // console.log(data);
+
+    const cacheData = await this.cacheManager.get('MOVIE_RECENT');
+
+    if (cacheData) {
+      console.log('캐시있어요');
+      return cacheData;
+    }
+
+    const data = this.movieRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 10,
+    });
+
+    // TTL -> 0 으로 하면 무한으로 저장
+    // ms 으로 입력 3000 -> 3초
+    // module 에서 모듈단위로도 설정할 수 있음
+    // await this.cacheManager.set('MOVIE_RECENT', data, 3000);
+
+    await this.cacheManager.set('MOVIE_RECENT', data);
+
+    return data;
+  }
 
   async findAll(dto: GetMoviesDto, userId?: number) {
     // Page based pagination 일때
