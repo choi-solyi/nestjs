@@ -12,6 +12,7 @@ export class TasksService {
     console.log('1초마다 실행');
   }
 
+  /// 잉여 파일 삭제
   // @Cron('* * * * * *')
   async eraseOrphanFiles() {
     const files = await readdir(join(process.cwd(), 'public', 'temp'));
