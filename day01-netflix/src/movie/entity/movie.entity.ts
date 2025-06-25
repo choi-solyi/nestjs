@@ -81,6 +81,9 @@ export class Movie extends BaseTable {
   @Column({ default: 0 })
   likeCount: number;
 
+  @Column({ default: 0 })
+  dislikeCount: number;
+
   @OneToMany(() => MovieUserLike, (mul) => mul.movie)
   likedUsers: MovieUserLike[];
 }
