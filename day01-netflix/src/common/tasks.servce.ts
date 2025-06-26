@@ -5,9 +5,11 @@ import { readdir, unlink } from 'fs/promises';
 import { join, parse } from 'path';
 import { Movie } from 'src/movie/entity/movie.entity';
 import { Repository } from 'typeorm';
-
+import { Logger } from '@nestjs/common';
 @Injectable()
 export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
   constructor(
     @InjectRepository(Movie)
     private readonly movieRepo: Repository<Movie>,
@@ -16,8 +18,17 @@ export class TasksService {
   ) {}
 
   // @Cron('* * * * * *')
+  @Cron('*/5 * * * * *')
   logEverySecond() {
-    console.log('1초마다 실행');
+    // console.log('1초마다 실행');
+    // logger의  중요도 순서
+    console.log('------------------------------------');
+    this.logger.fatal('FATAL 레벨 로그');
+    this.logger.error('ERROR 레벨 로그');
+    this.logger.warn('WARN 레벨 로그');
+    this.logger.log('LOG 레벨 로그');
+    this.logger.debug('DEBUG 레벨 로그');
+    this.logger.verbose('VERBOSE 레벨 로그');
   }
 
   /// 잉여 파일 삭제
@@ -48,6 +59,7 @@ export class TasksService {
     );
   }
 
+  /// 1분마다 좋아요/싫어요 갯수 업데이트
   // @Cron('0 * * * * *')
   async calculateMovieLikeCounts() {
     await this.movieRepo.query(
@@ -70,24 +82,25 @@ export class TasksService {
     );
   }
 
-  @Cron('* * * * * *', {
-    name: 'printer',
-  })
+  /// Cron 이름 설정
+  // @Cron('* * * * * *', {
+  //   name: 'printer',
+  // })
   printer() {
     console.log('print every second');
   }
 
-  @Cron('*/5 * * * * *')
+  // @Cron('*/5 * * * * *')
   stopper() {
     console.log('----stopper run----');
 
     const job = this.schedulerRegistry.getCronJob('printer');
 
-    // console.log('# last date');
-    // console.log(job.lastDate());
+    console.log('# last date');
+    console.log(job.lastDate());
 
-    // console.log('# next date');
-    // console.log(job.nextDate());
+    console.log('# next date');
+    console.log(job.nextDate());
 
     console.log('# next dates');
     console.log(job.nextDates(5));
