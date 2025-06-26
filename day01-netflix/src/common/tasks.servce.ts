@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { readdir, unlink } from 'fs/promises';
@@ -7,6 +7,7 @@ import { Movie } from 'src/movie/entity/movie.entity';
 import { Repository } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { DefaultLogger } from './logger/default.logger';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 @Injectable()
 export class TasksService {
   // private readonly logger = new Logger(TasksService.name);
@@ -17,7 +18,10 @@ export class TasksService {
 
     private readonly schedulerRegistry: SchedulerRegistry,
 
-    private readonly logger: DefaultLogger,
+    // private readonly logger: DefaultLogger,
+
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   // @Cron('* * * * * *')
@@ -26,12 +30,12 @@ export class TasksService {
     // console.log('1초마다 실행');
     // logger의  중요도 순서
     console.log('------------------------------------');
-    this.logger.fatal('FATAL 레벨 로그');
+    // this.logger.fatal('FATAL 레벨 로그');
     this.logger.error('ERROR 레벨 로그');
     this.logger.warn('WARN 레벨 로그');
     this.logger.log('LOG 레벨 로그');
-    this.logger.debug('DEBUG 레벨 로그');
-    this.logger.verbose('VERBOSE 레벨 로그');
+    // this.logger.debug('DEBUG 레벨 로그');
+    // this.logger.verbose('VERBOSE 레벨 로그');
   }
 
   /// 잉여 파일 삭제
