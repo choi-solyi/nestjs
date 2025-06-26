@@ -6,15 +6,18 @@ import { join, parse } from 'path';
 import { Movie } from 'src/movie/entity/movie.entity';
 import { Repository } from 'typeorm';
 import { Logger } from '@nestjs/common';
+import { DefaultLogger } from './logger/default.logger';
 @Injectable()
 export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
+  // private readonly logger = new Logger(TasksService.name);
 
   constructor(
     @InjectRepository(Movie)
     private readonly movieRepo: Repository<Movie>,
 
     private readonly schedulerRegistry: SchedulerRegistry,
+
+    private readonly logger: DefaultLogger,
   ) {}
 
   // @Cron('* * * * * *')
