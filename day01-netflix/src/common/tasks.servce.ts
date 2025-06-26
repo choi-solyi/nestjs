@@ -25,7 +25,7 @@ export class TasksService {
   ) {}
 
   // @Cron('* * * * * *')
-  @Cron('*/5 * * * * *')
+  // @Cron('*/5 * * * * *')
   logEverySecond() {
     // console.log('1초마다 실행');
     // logger의  중요도 순서
