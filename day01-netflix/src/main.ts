@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
@@ -8,6 +8,12 @@ async function bootstrap() {
     // logger: false, // 모든 log가 보이지 않음
     // logger: ['error'], // 에러 레벨 부터 그 위에 해당되는 모든 로그가 보임
   });
+  // app.setGlobalPrefix('v1');
+  // app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(
     new ValidationPipe({
