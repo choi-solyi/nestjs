@@ -8,10 +8,23 @@ async function bootstrap() {
     // logger: false, // 모든 log가 보이지 않음
     // logger: ['error'], // 에러 레벨 부터 그 위에 해당되는 모든 로그가 보임
   });
+  // [전체 versioning]
   // app.setGlobalPrefix('v1');
+
+  // [Versioning - URI]
   // app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+
+  // [Versioning - Header] : Postman 에서 Header에 version 추가
   app.enableVersioning({
-    type: VersioningType.URI,
+    type: VersioningType.HEADER,
+    header: 'version',
+  });
+
+  // [Versioning - MEDIA_TYPE]
+  // : Postman에서 Header에 Accept : application/json;v=1 추가
+  app.enableVersioning({
+    type: VersioningType.MEDIA_TYPE,
+    key: 'v=',
   });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
