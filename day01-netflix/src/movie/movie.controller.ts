@@ -45,27 +45,12 @@ import {
   CacheInterceptor as CI,
 } from '@nestjs/cache-manager';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
-
-// [versioning]
-@Controller({
-  path: 'movie',
-  version: '2',
-})
-export class MovieControllerV2 {
-  constructor(private readonly movieService: MovieService) {}
-
-  @Get()
-  @Public()
-  getMovies() {
-    return [];
-  }
-}
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller({
   path: 'movie',
-  // version: ['1', '3'],
-  version: VERSION_NEUTRAL,
 })
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 // @UseInterceptors(CacheInterceptor)
 export class MovieController {
@@ -77,7 +62,6 @@ export class MovieController {
     count: 5,
     unit: 'minute',
   })
-  // @Version(['1', '3'])
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }

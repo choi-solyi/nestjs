@@ -2,29 +2,28 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     // logger: false, // 모든 log가 보이지 않음
     // logger: ['error'], // 에러 레벨 부터 그 위에 해당되는 모든 로그가 보임
   });
-  // [전체 versioning]
-  // app.setGlobalPrefix('v1');
 
-  // [Versioning - URI]
-  // app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+  const config = new DocumentBuilder()
+    .setTitle('최솔이의 넷플릭스')
+    .setDescription('최솔이의 NestJS 학습 일지')
+    .setVersion('1.0')
+    .addBasicAuth()
+    .addBearerAuth()
+    .build();
 
-  // [Versioning - Header] : Postman 에서 Header에 version 추가
-  app.enableVersioning({
-    type: VersioningType.HEADER,
-    header: 'version',
-  });
+  const document = SwaggerModule.createDocument(app, config);
 
-  // [Versioning - MEDIA_TYPE]
-  // : Postman에서 Header에 Accept : application/json;v=1 추가
-  app.enableVersioning({
-    type: VersioningType.MEDIA_TYPE,
-    key: 'v=',
+  SwaggerModule.setup('swagger', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, // 브라우저에서 새로고침해도 authorization 기억함
+    },
   });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
