@@ -45,7 +45,7 @@ import {
   CacheInterceptor as CI,
 } from '@nestjs/cache-manager';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller({
   path: 'movie',
@@ -61,6 +61,17 @@ export class MovieController {
   @Throttle({
     count: 5,
     unit: 'minute',
+  })
+  @ApiOperation({
+    description: 'API설명',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '성공! ',
+  })
+  @ApiResponse({
+    status: 400,
+    description: '실패',
   })
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);

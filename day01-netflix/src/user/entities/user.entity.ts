@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { BaseTable } from 'src/common/entity/base.entity';
 import { MovieUserLike } from 'src/movie/entity/movie-user-like.entity';
@@ -22,6 +23,7 @@ export class User extends BaseTable {
     toClassOnly: false, // 요청을 받을때
     toPlainOnly: true, // 응답을 할때
   })
+  @ApiHideProperty()
   password: string;
 
   @Column({ enum: Role, default: Role.user })
